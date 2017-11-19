@@ -6,19 +6,37 @@
 #include <QHash>
 #include <QProcess>
 #include <QStringList>
+#include <QList>
+
+struct Parameter {
+  QString name;
+  QString value;
+};
 
 class Renamer : public QObject
 {
   Q_OBJECT
   public:
     Renamer(QObject *parent = nullptr);
-    void start(const QStringList& arguments);
+
+  public slots:
+     void start();
 
   private:
-    QString m_collectedData;
-    QHash<QString, QString> m_parameters;
     static QStringList m_reserved;
+
+    QString m_collectedData;
     QProcess* m_process;
+    QStringList m_addition;
+    QString m_merger;
+    QString m_separator;
+    QString m_fileName;
+    QList<Parameter> m_checks;
+    QStringList m_encodingSettings;
+    QString m_replacements;
+    Parameter m_currentParameter;
+
+
     void outputError(const QString& message);
     void outputHelp();
     bool checkParameterExistance(const QStringList& arguments);
@@ -26,8 +44,10 @@ class Renamer : public QObject
     void processData();
     bool containsReservedCharacter(const QString& value);
     bool checkParmeters();
-    void setParameter(QString argument, const QString& name);
+    bool setParameter(QString argument, const QString& name);
     bool setFile(const QString& fileName);
+    void applyReplacements(QString& value);
+    void rename();
 
   signals:
     void closeApplication();

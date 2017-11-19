@@ -1,6 +1,7 @@
 #include <QCoreApplication>
 
 #include "Renamer.h"
+#include <QTimer>
 
 /**
  * @brief Creates a Renamer-instance, connects it's closeApplication()-signal
@@ -13,7 +14,7 @@ int main(int argc, char *argv[])
 {
   QCoreApplication a(argc, argv);
   Renamer re;
-  a.connect(&re, SIGNAL(closeApplication()), &a, SLOT(quit()));
-  re.start(a.arguments());
+  QObject::connect(&re, SIGNAL(closeApplication()), &a, SLOT(quit()));
+  QTimer::singleShot(10, &re, SLOT(start()));
   return a.exec();
 }
