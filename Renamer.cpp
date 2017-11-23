@@ -131,10 +131,13 @@ void Renamer::rename()
 #ifdef Q_DEBUG
   std::cerr << qPrintable(QString("Renaming '%1' to '%2'.").arg(m_fileName).arg(newFileName));
 #endif
+  std::cerr << qPrintable(QString("Renaming '%1' to '%2'.").arg(m_fileName).arg(newFileName));
+  /*
   QFile file(m_fileName);
   if (!file.rename(newFileName)) {
     this->outputError(QObject::tr("Couldn't rename '%1' to '%2'!"));
   }
+  */
   emit closeApplication();
 }
 
@@ -186,6 +189,11 @@ void Renamer::processData()
   if (m_encodingSettings.isEmpty()) {
     m_encodingSettings = values.at(0).split(" / ");
   }
+
+  foreach(QString encoding, m_encodingSettings) {
+    std::cout << qPrintable(encoding) << std::endl;
+  }
+
   QStringList wanted = m_currentParameter.value.split(m_separator);
   if (wanted.isEmpty()) {
     this->analyse();
@@ -201,15 +209,15 @@ void Renamer::processData()
     lookingFor = rxlen.cap(1);
     foreach(QString encoding, m_encodingSettings) {
       if (encoding == lookingFor) {
-        m_addition << want.replace(lookingFor, QObject::tr("true"));
+        m_addition << want.replace("%"+lookingFor+"%", QObject::tr("true"));
         break;
       }
       if (encoding.startsWith(lookingFor + "=")) {
-        m_addition << want.replace(lookingFor, encoding.split("=").at(1));
+        m_addition << want.replace("%"+lookingFor+"%", encoding.split("=").at(1));
         break;
       }
       if (encoding.startsWith("no-" + lookingFor)) {
-        m_addition << want.replace(lookingFor, QObject::tr("false"));
+        m_addition << want.replace("%"+lookingFor+"%", QObject::tr("false"));
         break;
       }
     }
