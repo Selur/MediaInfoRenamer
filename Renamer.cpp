@@ -36,7 +36,7 @@ void Renamer::analyse()
     this->processData();
     return;
   }
-  // std::cerr << "building call for " << qPrintable(m_currentParameter.name) << std::endl;
+
   // build call
   QStringList call;
   QString mediainfo = QCoreApplication::applicationDirPath() + QDir::separator() + "mediainfo"; //
@@ -54,7 +54,6 @@ void Renamer::analyse()
   // start process
   m_collectedData.clear();
   if (m_process != nullptr) {
-    std::cerr << "deleting process,.." << std::endl;
     m_process->disconnect();
     delete m_process;
     m_process = nullptr;
@@ -131,13 +130,11 @@ void Renamer::rename()
 #ifdef Q_DEBUG
   std::cerr << qPrintable(QString("Renaming '%1' to '%2'.").arg(m_fileName).arg(newFileName));
 #endif
-  std::cerr << qPrintable(QString("Renaming '%1' to '%2'.").arg(m_fileName).arg(newFileName));
-  /*
+
   QFile file(m_fileName);
   if (!file.rename(newFileName)) {
     this->outputError(QObject::tr("Couldn't rename '%1' to '%2'!"));
   }
-  */
   emit closeApplication();
 }
 
@@ -188,10 +185,6 @@ void Renamer::processData()
   // EncodingSettings
   if (m_encodingSettings.isEmpty()) {
     m_encodingSettings = values.at(0).split(" / ");
-  }
-
-  foreach(QString encoding, m_encodingSettings) {
-    std::cout << qPrintable(encoding) << std::endl;
   }
 
   QStringList wanted = m_currentParameter.value.split(m_separator);
