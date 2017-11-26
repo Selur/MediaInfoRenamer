@@ -319,10 +319,9 @@ bool Renamer::checkParameterExistance(const QStringList& arguments)
     return false;
   }
   QStringList names;
-  names << "Inform" << "Merger" << "Separator" << "EncodingSettings" << "Replacements";
+  names << "Inform" << "Merger" << "Separator" << "EncodingSettings" << "Replacements" << "FileSeparator";
   bool first = true;
   foreach (QString argument, arguments) {
-    argument = argument.trimmed();
     if (first) {
       first = false;
       continue;
