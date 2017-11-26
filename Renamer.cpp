@@ -197,7 +197,7 @@ void Renamer::processData()
     this->analyse();
     return;
   }
-  QString lookingFor;
+  QString lookingFor, value;
   QRegExp rxlen(".*%(.*)%.*");
   foreach(QString want, wanted) {
     int pos = rxlen.indexIn(want);
@@ -211,7 +211,9 @@ void Renamer::processData()
         break;
       }
       if (encoding.startsWith(lookingFor + "=")) {
-        m_addition << want.replace("%"+lookingFor+"%", encoding.split("=").at(1));
+        value = encoding.split("=").at(1);
+        this->applyReplacements(value);
+        m_addition << want.replace("%"+lookingFor+"%", value);
         break;
       }
       if (encoding.startsWith("no-" + lookingFor)) {
