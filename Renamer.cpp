@@ -13,7 +13,7 @@ QStringList Renamer::m_reserved = QStringList() << "*" << ":" << "/" << "\\" << 
 Renamer::Renamer(QObject *parent)
   : QObject(parent), m_collectedData(), m_process(nullptr), m_addition(),
     m_merger(), m_separator(), m_fileName(), m_checks(), m_encodingSettings(), m_replacements(),
-    m_currentParameter()
+    m_currentParameter(), m_fileseparator()
 {
  this->setObjectName("Renamer");
 }
@@ -123,7 +123,12 @@ void Renamer::rename()
     emit closeApplication();
     return;
   }
-  addition = m_merger + addition;
+
+  if (m_fileseparator.isEmpty()) {
+    addition = m_merger + addition;
+  } else {
+    addition = m_fileseparator + addition;
+  }
 
   QString newFileName = m_fileName;
   newFileName.insert(newFileName.lastIndexOf("."), addition);
@@ -242,13 +247,14 @@ void Renamer::outputHelp()
 {
   QStringList output;
   output << QObject::tr("Usage:");
-  output << QObject::tr("MediaInfoRenamer --Inform=<InformCall> [--EncodingSettings=<parameters>] --Separator=<used seperator> --Merger=<append> [--Replacements=<replacements>] <File>");
+  output << QObject::tr("MediaInfoRenamer --Inform=<InformCall> [--EncodingSettings=<parameters>] --Separator=<used seperator> --Merger=<append> [--Replacements=<replacements>] [--FileSeparator=<separator>] <File>");
   output << QObject::tr("Parameters:");
   output << "  " + QObject::tr("--Inform:  'Inform'-parameters for MediaInfo. Call \"mediainfo --Info-parameters\" to get a full list of supported options.");
   output << "  " + QObject::tr("--EncodingSettings:  analog zu den 'Inform'-parameter once specified that some of the encoding setting should be added to the output name.");
   output << "  " + QObject::tr("--Separator: The separator used inside the 'Inform'-parameter.");
   output << "  " + QObject::tr("--Merger:    The text/character that should be used to combine the collected data.");
   output << "  " + QObject::tr("--Replacements: List of replacements separated by 'Sepearator'");
+  output << "  " + QObject::tr("--FileSeparator: Place this text between the file name and the addition, when not used, 'Merger' will be used.");
   output << "  " + QObject::tr("File:        The file which should be analyzed and renamed.");
   foreach (const QString& line, output) {
     std::cout << qPrintable(line) << std::endl;
@@ -277,7 +283,7 @@ bool Renamer::setFile(const QString& fileName)
  */
 bool Renamer::setParameter(QString argument, const QString& name)
 {
-  QStringList temp = argument.trimmed().split("=");
+  QStringList temp = argument.split("=");
   if (QString("--%1").arg(name) != temp.at(0)) {
     this->outputError(QObject::tr("Unknown parameter '%1': '%2'!").arg(name).arg(argument));
     this->outputHelp();
@@ -295,6 +301,8 @@ bool Renamer::setParameter(QString argument, const QString& name)
     m_merger = temp.at(1);
   } else  if (name == "Replacements") {
     m_replacements = temp.at(1);
+  } else if (name == "FileSeparator") {
+    m_fileseparator = temp.at(1);
   }
   return true;
 }
@@ -314,6 +322,7 @@ bool Renamer::checkParameterExistance(const QStringList& arguments)
   names << "Inform" << "Merger" << "Separator" << "EncodingSettings" << "Replacements";
   bool first = true;
   foreach (QString argument, arguments) {
+    argument = argument.trimmed();
     if (first) {
       first = false;
       continue;

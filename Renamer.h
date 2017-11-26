@@ -35,6 +35,7 @@ class Renamer : public QObject
     QStringList m_encodingSettings;
     QString m_replacements;
     Parameter m_currentParameter;
+    QString m_fileseparator;
 
 
     void outputError(const QString& message);
